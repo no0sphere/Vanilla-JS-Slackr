@@ -17,31 +17,40 @@
     <h1>Slackr</h1>
   </header>
   <main role="main">
-    <!-- app goes here -->
-    <div id="page-dashboard" class="page-block">
-      Dashboard
-      <button type="button" id="logout">Logout</button>
-    </div>
-    <div id="page-register" class="page-block">
-      <h3>Register</h3>
-      <form>
-        Email: <input id="register-email" type="email" value="hayden@unsw.edu.au" /><br />
-        Name: <input id="register-name" type="text" value="Hayden" /><br />
-        Password: <input id="register-password" type="password" value="123456abcdefg" /><br />
-        Password (confirm): <input id="register-password-confirm" type="password" value="123456abcdefg" /><br />
-        <button type="button" id="register-submit">Submit</button>
-      </form>
-      Already registered? <a href="#" class="redirect" redirect="login">Login</a> 
-    </div>
-    <div id="page-login" class="page-block">
-      <h3>Login</h3>
-      <form>
-        Email: <input id="login-email" type="email" value="hayden@unsw.edu.au" /><br />
-        Password: <input id="login-password" type="password" value="123456abcdefg" /><br />
-        <button type="button" id="login-submit">Submit</button>
-      </form>
-      Not yet a member? <a href="#" class="redirect" redirect="register">Register</a> 
-    </div>
+      <!-- app goes here -->
+
+      <!-- take place of alert -->
+      <div id="errorPopup" class="error-popup">
+          <div class="error-content">
+              <button id="closeErrorPopupBtn">X</button>
+              <p id="errorMessage"></p>
+          </div>
+      </div>
+
+      <div id="page-dashboard" class="page-block">
+          Dashboard
+          <button type="button" id="logout">Logout</button>
+      </div>
+      <div id="page-register" class="page-block">
+          <h3>Register</h3>
+          <form>
+              Email: <input id="register-email" type="email" value="hayden@unsw.edu.au" /><br />
+              Name: <input id="register-name" type="text" value="Hayden" /><br />
+              Password: <input id="register-password" type="password" value="123456abcdefg" /><br />
+              Password (confirm): <input id="register-password-confirm" type="password" value="123456abcdefg" /><br />
+              <button type="button" id="register-submit">Submit</button>
+          </form>
+          Already registered? <a href="#" class="redirect" redirect="login">Login</a>
+      </div>
+      <div id="page-login" class="page-block">
+          <h3>Login</h3>
+          <form>
+              Email: <input id="login-email" type="email" value="hayden@unsw.edu.au" /><br />
+              Password: <input id="login-password" type="password" value="123456abcdefg" /><br />
+              <button type="button" id="login-submit">Submit</button>
+          </form>
+          Not yet a member? <a href="#" class="redirect" redirect="register">Register</a>
+      </div>
   </main>
   <footer>
     <p>&copy; Slackr</p>

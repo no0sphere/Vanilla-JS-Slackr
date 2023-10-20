@@ -4,6 +4,13 @@ import { fileToDataUrl, apiCallPost } from './helpers.js';
 
 let globalToken = null;
 
+function showErrorPopup(message) {	//take place of alert
+	document.getElementById('errorMessage').textContent = message;
+	document.getElementById('errorPopup').style.display = 'block';
+	document.getElementById('error-content').style.display = 'block';
+}
+
+
 const apiCallGet2 = (path, body, authed=false) => {
 	return new Promise((resolve, reject) => {
 		fetch(`http://localhost:5005/${path}`, {
@@ -69,7 +76,7 @@ document.getElementById('register-submit').addEventListener('click', (e) => { //
 	const password = document.getElementById('register-password').value;
 	const passwordConfirm = document.getElementById('register-password-confirm').value;
 	if (password !== passwordConfirm) {
-		alert('Passwords need to match');
+		showErrorPopup('Passwords need to match');
 	} else {
 		console.log(email, name, password, passwordConfirm);
 
@@ -85,7 +92,7 @@ document.getElementById('register-submit').addEventListener('click', (e) => { //
 			showPage('dashboard');
 		})
 		.catch((msg) => {
-			alert(msg); //alert doesn't satisfy our requirements
+			showErrorPopup(msg); //showErrorPopup doesn't satisfy our requirements
 		});
 	}
 });
@@ -105,7 +112,7 @@ document.getElementById('login-submit').addEventListener('click', (e) => {
 		showPage('dashboard');
 	})
 	.catch((msg) => {
-		alert(msg);
+		showErrorPopup(msg);
 	});
 });
 
@@ -116,8 +123,13 @@ document.getElementById('logout').addEventListener('click', (e) => {
 		showPage('register');
 	})
 	.catch((msg) => {
-		alert(msg);
+		showErrorPopup(msg);
 	});
+});
+
+document.getElementById('closeErrorPopupBtn').addEventListener('click', ()=> { //close error popup
+	document.getElementById('errorPopup').style.display = 'none';
+	document.getElementById('error-content').style.display = 'none';
 });
 
 for (const redirect of document.querySelectorAll('.redirect')) {
