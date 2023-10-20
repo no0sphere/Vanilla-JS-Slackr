@@ -1,0 +1,3 @@
+-c-1 to disable cache
+
+npx http-server frontend -c-1 -p [port]
