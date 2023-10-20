@@ -3,6 +3,7 @@ import { BACKEND_PORT } from './config.js';
 import { fileToDataUrl, apiCallPost } from './helpers.js';
 
 let globalToken = null;
+let globalUserId = null;
 
 function showErrorPopup(message) {	//take place of alert
 	document.getElementById('errorMessage').textContent = message;
@@ -33,9 +34,10 @@ const apiCallGet2 = (path, body, authed=false) => {
 
 const loadDashboard = () => {
 	apiCallGet2('channel', {}, true)
-	.then(body => {
-		console.log('channels', body);
-	});
+		.then(body => {
+			console.log('channels', body);
+			
+		});
 };
 
 const showPage = (pageName) => {
@@ -87,7 +89,9 @@ document.getElementById('register-submit').addEventListener('click', (e) => { //
 		.then((body) => {
 			const { token, userId } = body;
 			globalToken = token;
+			globalUserId = userId;
 			localStorage.setItem('token', token);
+			localStorage.setItem('userid', userid);
 			showPage('dashboard');
 		})
 		.catch((msg) => {
@@ -107,7 +111,9 @@ document.getElementById('login-submit').addEventListener('click', (e) => {
 	.then((body) => {
 		const { token, userId } = body;
 		globalToken = token;
+		globalUserId = userId;
 		localStorage.setItem('token', token);
+		localStorage.setItem('userid', userid);
 		showPage('dashboard');
 	})
 	.catch((msg) => {
@@ -119,6 +125,7 @@ document.getElementById('logout').addEventListener('click', (e) => {
 	apiCallPost2('auth/logout', {}, true)
 	.then(() => {
 		localStorage.removeItem('token');
+		localStorage.removeItem('userid');
 		showPage('register');
 	})
 	.catch((msg) => {
@@ -141,9 +148,39 @@ const localStorageToken = localStorage.getItem('token');
 if (localStorageToken !== null) {
 	globalToken = localStorageToken;
 }
+if (localStorage.getItem('userid') !== null) {
+    globalUserId = localStorage.getItem('userid');
+}
 
-if (globalToken === null) {
+if (globalToken === null) {  //skip login page if already logged in
 	showPage('register');
 } else {
 	showPage('dashboard');
 }
+
+
+document.getElementById('btn-create-channel').addEventListener('click', () => {
+	document.getElementById('creating-channel-popup').style.display = 'block';
+});
+
+document.getElementById('close-creating-channel-PopupBtn').addEventListener('click', () => { //close channel-creating popup
+	document.getElementById('creating-channel-popup').style.display = 'none';
+});
+
+document.getElementById('creating-channel-submit').addEventListener('click', () => {
+	const name = document.getElementById('channel-name').value;
+	const description = document.getElementById('channel-description').value;
+	const isPrivate = document.getElementById('private-check').checked;
+	apiCallPost2('channel', {
+		name: name,
+		private: isPrivate,
+		description: description,
+	}, true)
+		.then(() => {
+			document.getElementById('creating-channel-popup').style.display = 'none';
+			loadDashboard();
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+});
