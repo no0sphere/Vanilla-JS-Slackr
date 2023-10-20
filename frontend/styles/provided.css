@@ -8,6 +8,10 @@ html, body {
     font-family: -apple-system, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
+.page-block {
+    display: none;
+}
+
 /* for the error popup, taking place of the alert() function */
 .error-popup {
     display: none;
@@ -20,12 +24,8 @@ html, body {
     z-index: 1;
 }
 
-.page-block {
-    display: none;
-}
 
 .error-content {
-    display: none;
     position: absolute;
     top: 50%;
     left: 50%;

@@ -7,7 +7,6 @@ let globalToken = null;
 function showErrorPopup(message) {	//take place of alert
 	document.getElementById('errorMessage').textContent = message;
 	document.getElementById('errorPopup').style.display = 'block';
-	document.getElementById('error-content').style.display = 'block';
 }
 
 
@@ -98,8 +97,8 @@ document.getElementById('register-submit').addEventListener('click', (e) => { //
 });
 
 document.getElementById('login-submit').addEventListener('click', (e) => {
-	const email = document.getElementById('register-email').value;
-	const password = document.getElementById('register-password').value;
+	const email = document.getElementById('login-email').value;
+	const password = document.getElementById('login-password').value;
 
 	apiCallPost2('auth/login', {
 		email: email,
@@ -129,7 +128,6 @@ document.getElementById('logout').addEventListener('click', (e) => {
 
 document.getElementById('closeErrorPopupBtn').addEventListener('click', ()=> { //close error popup
 	document.getElementById('errorPopup').style.display = 'none';
-	document.getElementById('error-content').style.display = 'none';
 });
 
 for (const redirect of document.querySelectorAll('.redirect')) {
