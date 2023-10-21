@@ -50,34 +50,48 @@
       </div>
 
       <div id="page-dashboard" class="page-block">
-          <!--channels are here-->>
-          Dashboard
+          <!--channels are here-->
+          >Dashboard
           <button type="button" id="logout">Logout</button>
-          <div id="all-channels-list">
-              <div id="public-channels-bar">
-                  <button>
-                      <h3>Public:  </h3>
-                  </button>
-                  <div id="public-channels-list">
+          <div id="user-dashboard">
+              <div id="all-channels-list">
+                  <div id="public-channels-bar">
+                      <button>
+                          <h3>Public:  </h3>
+                      </button>
+                      <div id="public-channels-list" class="list-group">
 
+                      </div>
+                  </div>
+                  <div id="private-channels-bar">
+                      <button>
+                          <h3>Private:</h3>
+                      </button>
+                      <div id="private-channels-list" class="list-group">
+
+                      </div>
+                  </div>
+                  <div>
+                      <button id="btn-create-channel" title="Create a Channel">
+                          <h3>+</h3>
+                      </button>
                   </div>
               </div>
-              <div id="private-channels-bar">
-                  <button>
-                      <h3>Private:</h3>
-                  </button>
-                  <div id="private-channels-list">
+              <div id="channel-screen">
+                  <div id="channel-title-bar">
+                      <h3 id="channel-title-bar-name"></h3>
+                      <button id="btn-channel-info">info</button>
+                      <button id="btn-channel-info-join" class="hidden">join channel</button>
+                      <button id="btn-channel-info-leave" class="hidden">leave channel</button>
+                  </div>
+                  <div id="channel-chatroom">
 
                   </div>
-              </div>
-              <div>
-                  <button id="btn-create-channel" title="Create a Channel">
-                      <h3>+</h3>
-                  </button>
               </div>
           </div>
       </div>
-      <div id="creating-channel-popup">
+
+      <div id="creating-channel-popup" class="popup">
           <div id="creating-channel">
               <button id="close-creating-channel-PopupBtn">X</button>
               <form>
@@ -99,6 +113,44 @@
           </div>
       </div>
 
+      <div id="channel-info-popup" class="popup">
+            <div id="channel-info-content">
+                <button id="close-channel-info-PopupBtn">X</button>
+                <div id="channel-info">
+                    <div><h3>Channel Name:</h3><p id="channel-info-name"></p></div>
+                    <div><h3>Channel ID:</h3><p id="channel-info-id">Channel ID:</p></div>
+                    <div><h3>Channel Creator:</h3><p id="channel-info-creator">Created by:</p></div>
+                    <div><h3>Channel Created Time:</h3><p id="channel-info-created-time">Created at:</p></div>
+                    <div><h3>Channel Type:</h3><p id="channel-info-isPrivate"></p></div>
+                    <div><h3>Channel description:</h3><p id="channel-info-description"></p></div>
+                    <div id="channel-info-members">
+                        <h3>Members:</h3>
+                        <div id="channel-info-members-list">
+
+                        </div>
+                    </div>
+                    <div>New name or description? <button id="btn-channel-info-edit">edit</button></div>
+                </div>
+            </div>
+      </div>
+
+      <div id="channel-editing">
+          <div id="channel-editing-content">
+              <button id="close-editing-channel-PopupBtn">X</button>
+              <form>
+                  <div class="mb-3">
+                      <label for="new-channel-name" class="form-label">New Channel Name</label>
+                      <input type="text" class="form-control" id="new-channel-name" aria-describedby="new-channel-name-help">
+                      <div id="new-channel-name-help" class="form-text">Name of your channel.</div>
+                  </div>
+                  <div class="mb-3">
+                      <label for="new-channel-discription" class="form-label">New Discription for channel</label>
+                      <textarea rows="5" cols="30" type="text" class="form-control" id="new-channel-description">Too lazy to discribe.</textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="editing-channel-submit">Submit</button>
+              </form>
+          </div>
+      </div>
 
   </main>
   <footer>

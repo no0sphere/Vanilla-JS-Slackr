@@ -1,14 +1,23 @@
 /* styles that relate to channels*/
 
-#creating-channel-popup {
-    display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
+#user-dashboard {
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+}
+
+#channel-title-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 10%;
+    width: 100%;
+    background-color: #f2f2f2;
+    border-bottom: 1px solid black;
+    gap: 20px;
 }
 
 #creating-channel {
@@ -22,4 +31,58 @@
     background-color: white;
     border: 1px solid black;
     z-index: 2;
+}
+
+#channel-editing {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 3;
+}
+
+#channel-editing-content {
+    position: absolute;
+    width: 50%;
+    height: 60%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: white;
+    border: 1px solid black;
+    z-index: 4;
+}
+
+#all-channels-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 15%;
+}
+
+#channel-screen {
+    display: none;
+    height: 100%;
+    width:85%;
+}
+
+#channel-info-content {
+    position: absolute;
+    width: 50%;
+    height: 60%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background-color: white;
+    border: 1px solid black;
+    z-index: 2;
+}
+
+.hidden {
+    display: none;
 }
