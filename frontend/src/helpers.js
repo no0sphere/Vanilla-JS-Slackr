@@ -49,3 +49,10 @@ export const apiCallPost = (path, body) => {
           });
   });
 };
+
+export const clearChildren = (element) => {
+
+    while (element.firstChild) {
+        element.removeChild(element.lastChild);
+    }
+}

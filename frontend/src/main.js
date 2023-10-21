@@ -1,6 +1,6 @@
 import { BACKEND_PORT } from './config.js';
 // A helper you may want to use when uploading new images to the server.
-import { fileToDataUrl, apiCallPost } from './helpers.js';
+import { fileToDataUrl, apiCallPost, clearChildren } from './helpers.js';
 
 let globalToken = null;
 let globalUserId = null;
@@ -33,10 +33,34 @@ const apiCallGet2 = (path, body, authed=false) => {
 }
 
 const loadDashboard = () => {
+	// hard reset channel list 
+	const public_channel_list = document.getElementById("public-channels-list");
+	const private_channel_list = document.getElementById("private-channels-list");
+	clearChildren(public_channel_list);
+	clearChildren(private_channel_list);
 	apiCallGet2('channel', {}, true)
 		.then(body => {
 			console.log('channels', body);
-			
+			body.channels.map(channel => {
+				const current_channel = document.createElement("div");
+				current_channel.setAttribute("id", "channel_" + channel.id);
+				current_channel.setAttribute("class", "channel");
+				const current_channel_name = document.createElement("div");
+				current_channel_name.setAttribute("class", "channel-name");
+				current_channel_name.textContent = channel.name;
+				current_channel.appendChild(current_channel_name);
+				if (channel.private) {
+                    current_channel.setAttribute("class", "private-channel");
+                    private_channel_list.appendChild(current_channel);
+				}
+				else {
+                    current_channel.setAttribute("class", "public-channel");
+                    public_channel_list.appendChild(current_channel);
+                }
+
+
+			});
+
 		});
 };
 
@@ -184,3 +208,4 @@ document.getElementById('creating-channel-submit').addEventListener('click', () 
 			showErrorPopup(msg);
 		});
 });
+
