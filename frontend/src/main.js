@@ -500,8 +500,14 @@ if (globalToken === null) {  //skip login page if already logged in
 }
 
 
-document.getElementById('btn-create-channel').addEventListener('click', () => {
+document.getElementById('btn-create-public-channel').addEventListener('click', () => {
 	document.getElementById('creating-channel-popup').style.display = 'block';
+	document.getElementById('private-check').checked = false;
+});
+
+document.getElementById('btn-create-private-channel').addEventListener('click', () => {
+	document.getElementById('creating-channel-popup').style.display = 'block';
+	document.getElementById('private-check').checked = true;
 });
 
 document.getElementById('close-creating-channel-PopupBtn').addEventListener('click', () => { //close channel-creating popup
