@@ -81,6 +81,7 @@
     background-color: white;
     border: 1px solid black;
     z-index: 2;
+    overflow-y: auto;
 }
 
 #channel-chatroom {

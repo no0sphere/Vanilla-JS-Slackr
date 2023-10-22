@@ -85,15 +85,39 @@ const apiCallPut2 = (path, body, authed = false) => {
 
 let current_channel_id = null;
 let current_channel_members = {};
+let current_channel_messages_count = 0;
 
-const loadMessages = () => {
-	return apiCallGet2(`message/${current_channel_id}?start=${0}`, {}, true) //load messages
+
+
+document.getElementById('channel-chatroom').addEventListener('scroll', () => {
+	const chatroom_scroll = document.getElementById('channel-chatroom');
+	if (chatroom_scroll.scrollTop <= 0) { // 5px from the top
+		loadMoreMessages();
+	}
+});
+
+const loadMoreMessages = () => {
+	const message_list = document.getElementById('channel-chatroom');
+	const loader = document.createElement("div");
+	const loader_text = document.createElement("p");
+	loader.setAttribute("class", "hidden");
+	loader.setAttribute("id", "loader");
+	loader_text.innerText = "Loading...";
+	loader_text.setAttribute("style", "text-align: center; margin-top: 10px;");
+    loader.appendChild(loader_text);
+
+	// Display the loader
+	insertAsFirstChild(message_list, loader);
+	loader.style.display = 'block';
+
+	apiCallGet2(`message/${current_channel_id}?start=${current_channel_messages_count}`, {}, true) //load more messages
 		.then(body => {
 			console.log(body);
+			loader.style.display = 'none';
 			document.getElementById('message-input-bar').style.display = 'block';
 			const message_list = document.getElementById("channel-chatroom");
-			clearChildren(message_list);
 			body.messages.forEach(message => {
+				current_channel_messages_count += 1;
 				const current_message = document.createElement("div");
 				current_message.setAttribute("class", "message");
 				const current_message_content = document.createElement("div");
@@ -108,7 +132,7 @@ const loadMessages = () => {
 				current_message_content_time.setAttribute("style", "margin-left: 20px;");
 				const message_content_sender = document.createElement("div");
 				message_content_sender.setAttribute("class", "message-sender");
-				message_content_sender.setAttribute("style", "display: flex; flex-direction: row;")
+				message_content_sender.setAttribute("style", "display: flex; flex-direction: row; font-weight: bold;")
 				const message_content_sender_name = document.createElement("h7");
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
@@ -136,6 +160,67 @@ const loadMessages = () => {
 				current_message.appendChild(current_message_content);
 				insertAsFirstChild(message_list, current_message);
 			});
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+
+
+}
+
+const loadMessages = () => {
+	return apiCallGet2(`message/${current_channel_id}?start=0`, {}, true) //load messages
+		.then(body => {
+			console.log(body);
+			document.getElementById('message-input-bar').style.display = 'block';
+			const message_list = document.getElementById("channel-chatroom");
+			clearChildren(message_list);
+			current_channel_messages_count = 0; 
+			body.messages.forEach(message => {
+				current_channel_messages_count += 1;
+				const current_message = document.createElement("div");
+				current_message.setAttribute("class", "message");
+				const current_message_content = document.createElement("div");
+				current_message_content.setAttribute("class", "message-content");
+				const current_message_content_text = document.createElement("p");
+				current_message_content_text.setAttribute("class", "message-text");
+				current_message_content_text.innerText = message.message;
+				const current_message_content_time = document.createElement("p");
+				current_message_content_time.setAttribute("class", "message-time");
+				const date = new Date(message.sentAt);
+				current_message_content_time.innerText = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+				current_message_content_time.setAttribute("style", "margin-left: 20px;");
+				const message_content_sender = document.createElement("div");
+				message_content_sender.setAttribute("class", "message-sender");
+				message_content_sender.setAttribute("style", "display: flex; flex-direction: row; font-weight: bold;")
+				const message_content_sender_name = document.createElement("h7");
+				message_content_sender_name.setAttribute("class", "message-sender_name");
+				message_content_sender_name.innerText = message.sender;
+
+				if (message.sender === globalUserId) {
+					current_message_content.setAttribute("style", "background-color: #e6e6e6; border-radius: 10px; padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 10px; margin-bottom: 10px; color: green;");
+				}
+
+				if (message.sender in current_channel_members) {  //Change sender id to name
+					message_content_sender_name.innerText = current_channel_members[message.sender];
+				}
+				const message_content_sender_avatar = document.createElement("img");
+				message_content_sender_avatar.setAttribute("class", "message-user-avatar");
+				message_content_sender_avatar.setAttribute("src", "./assets/default_avatar.jpg");
+				message_content_sender_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
+
+				if (message.image) {
+					message_content_sender_avatar.setAttribute("src", message.image);
+				};
+				current_message_content.appendChild(message_content_sender);
+				message_content_sender.appendChild(message_content_sender_avatar);
+				message_content_sender.appendChild(message_content_sender_name);
+				message_content_sender.appendChild(current_message_content_time);
+				current_message_content.appendChild(current_message_content_text);
+				current_message.appendChild(current_message_content);
+				insertAsFirstChild(message_list, current_message);
+			});
+			document.getElementById('channel-chatroom').scrollTop = document.getElementById('channel-chatroom').scrollHeight;
 		})
 		.catch((msg) => {
 			showErrorPopup(msg);
@@ -172,7 +257,6 @@ const loadDashboard = () => {		//load dashboard
 					document.getElementById('channel-screen').style.display = 'block';
 					document.getElementById('channel-title-bar-name').textContent = channel.name;
 					current_channel_id = channel.id;
-
 					if (channel.members.includes(globalUserId)) {  // load messages if user is in the channel
 						document.getElementById('btn-channel-info-leave').style.display = 'block';
 						document.getElementById('btn-channel-info-join').style.display = 'none';
@@ -186,7 +270,7 @@ const loadDashboard = () => {		//load dashboard
 								});
 						}
 
-						loadMessages()							
+						loadMessages()
 					}
 					else {
 						document.getElementById('btn-channel-info-join').style.display = 'block';
@@ -257,7 +341,6 @@ document.getElementById('btn-channel-info-join').addEventListener('click', () =>
 	apiCallPost2(`channel/${current_channel_id}/join`, {}, true)
 		.then(() => {
 			loadDashboard();
-			loadMessages();
 			document.getElementById('btn-channel-info-leave').style.display = 'block';
 			document.getElementById('btn-channel-info-join').style.display = 'none';
 		})
