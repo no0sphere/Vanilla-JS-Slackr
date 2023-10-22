@@ -1,10 +1,16 @@
 import { BACKEND_PORT } from './config.js';
 // A helper you may want to use when uploading new images to the server.
-import { fileToDataUrl, apiCallPost, clearChildren } from './helpers.js';
+import {
+	fileToDataUrl,
+	apiCallPost,
+	clearChildren,
+	insertAsFirstChild,
+} from './helpers.js';
 
 let globalToken = null;
 let globalUserId = null;
 
+console.log('BACKEND_PORT', BACKEND_PORT);
 function showErrorPopup(message) {	//take place of alert
 	document.getElementById('errorMessage').textContent = message;
 	document.getElementById('errorPopup').style.display = 'block';
@@ -78,6 +84,63 @@ const apiCallPut2 = (path, body, authed = false) => {
 }
 
 let current_channel_id = null;
+let current_channel_members = {};
+
+const loadMessages = () => {
+	return apiCallGet2(`message/${current_channel_id}?start=${0}`, {}, true) //load messages
+		.then(body => {
+			console.log(body);
+			document.getElementById('message-input-bar').style.display = 'block';
+			const message_list = document.getElementById("channel-chatroom");
+			clearChildren(message_list);
+			body.messages.forEach(message => {
+				const current_message = document.createElement("div");
+				current_message.setAttribute("class", "message");
+				const current_message_content = document.createElement("div");
+				current_message_content.setAttribute("class", "message-content");
+				const current_message_content_text = document.createElement("p");
+				current_message_content_text.setAttribute("class", "message-text");
+				current_message_content_text.innerText = message.message;
+				const current_message_content_time = document.createElement("p");
+				current_message_content_time.setAttribute("class", "message-time");
+				const date = new Date(message.sentAt);
+				current_message_content_time.innerText = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+				current_message_content_time.setAttribute("style", "margin-left: 20px;");
+				const message_content_sender = document.createElement("div");
+				message_content_sender.setAttribute("class", "message-sender");
+				message_content_sender.setAttribute("style", "display: flex; flex-direction: row;")
+				const message_content_sender_name = document.createElement("h7");
+				message_content_sender_name.setAttribute("class", "message-sender_name");
+				message_content_sender_name.innerText = message.sender;
+
+				if (message.sender === globalUserId) {
+					current_message_content.setAttribute("style", "background-color: #e6e6e6; border-radius: 10px; padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 10px; margin-bottom: 10px; color: green;");
+				}
+
+				if (message.sender in current_channel_members) {  //Change sender id to name
+					message_content_sender_name.innerText = current_channel_members[message.sender];
+				}
+				const message_content_sender_avatar = document.createElement("img");
+				message_content_sender_avatar.setAttribute("class", "message-user-avatar");
+				message_content_sender_avatar.setAttribute("src", "./assets/default_avatar.jpg");
+				message_content_sender_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
+
+				if (message.image) {
+					message_content_sender_avatar.setAttribute("src", message.image);
+				};
+				current_message_content.appendChild(message_content_sender);
+				message_content_sender.appendChild(message_content_sender_avatar);
+				message_content_sender.appendChild(message_content_sender_name);
+				message_content_sender.appendChild(current_message_content_time);
+				current_message_content.appendChild(current_message_content_text);
+				current_message.appendChild(current_message_content);
+				insertAsFirstChild(message_list, current_message);
+			});
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+}
 
 const loadDashboard = () => {		//load dashboard
 	// hard reset channel list 
@@ -89,7 +152,7 @@ const loadDashboard = () => {		//load dashboard
 		.then(body => {
 			console.log('globalUserId', globalUserId);
 			console.log('channels', body);
-			body.channels.map(channel => {	//load channels
+			body.channels.forEach(channel => {	//load channels
 				const current_channel = document.createElement("button");
 				current_channel.setAttribute("id", "channel_" + channel.id);
 				current_channel.setAttribute("type", "button");
@@ -109,14 +172,31 @@ const loadDashboard = () => {		//load dashboard
 					document.getElementById('channel-screen').style.display = 'block';
 					document.getElementById('channel-title-bar-name').textContent = channel.name;
 					current_channel_id = channel.id;
-					if (channel.members.includes(globalUserId)) {
+
+					if (channel.members.includes(globalUserId)) {  // load messages if user is in the channel
 						document.getElementById('btn-channel-info-leave').style.display = 'block';
 						document.getElementById('btn-channel-info-join').style.display = 'none';
+
+						for (const member of channel.members) {		//load members
+							apiCallGet2(`user/${member}`, {}, true)
+								.then(member_body => {
+									console.log(member_body);
+									current_channel_members[parseInt(member)] = `${member_body.name} (${member})`
+									console.log(current_channel_members);
+								});
+						}
+
+						loadMessages()							
 					}
 					else {
 						document.getElementById('btn-channel-info-join').style.display = 'block';
 						document.getElementById('btn-channel-info-leave').style.display = 'none';
+						document.getElementById('message-input-bar').style.display = 'none';
+						clearChildren(document.getElementById("channel-chatroom"));
+						document.getElementById('channel-chatroom').innerText = "You are not in this channel";
 					}
+
+
 				});
 
 			});
@@ -124,9 +204,28 @@ const loadDashboard = () => {		//load dashboard
 		});
 };
 
+
+document.getElementById('btn-send-message').addEventListener('click', () => {	//send message
+	const message = document.getElementById('message-input').value;
+	if (message.trim() === "") { // check if message is empty or only contains spaces
+		showErrorPopup("Message cannot be empty");
+        return;
+    }
+	apiCallPost2(`message/${current_channel_id}`, {
+		message: message,
+	}, true)
+		.then(() => {
+			document.getElementById('message-input').value = "";
+			loadMessages();
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+});
+
 document.getElementById('btn-channel-info-edit').addEventListener('click', () => {	//edit channel info
 	document.getElementById('new-channel-name').value = "";
-	document.getElementById('new-channel-description').value = "";
+	document.getElementById('new-channel-description').value = "Too lazy to describe.";
 	document.getElementById('channel-editing').style.display = 'block';
 });
 
@@ -134,7 +233,7 @@ document.getElementById('close-editing-channel-PopupBtn').addEventListener('clic
 	document.getElementById('channel-editing').style.display = 'none';
 });
 
-document.getElementById('editing-channel-submit').addEventListener('click', () => {  //edit channel info
+document.getElementById('editing-channel-submit').addEventListener('click', () => {  //submit channel-editing
 	const new_name = document.getElementById('new-channel-name').value;
 	const new_description = document.getElementById('new-channel-description').value;
 	apiCallPut2(`channel/${current_channel_id}`, {
@@ -158,12 +257,14 @@ document.getElementById('btn-channel-info-join').addEventListener('click', () =>
 	apiCallPost2(`channel/${current_channel_id}/join`, {}, true)
 		.then(() => {
 			loadDashboard();
+			loadMessages();
 			document.getElementById('btn-channel-info-leave').style.display = 'block';
 			document.getElementById('btn-channel-info-join').style.display = 'none';
 		})
 		.catch((msg) => {
 			showErrorPopup(msg);
 		});
+
 });
 
 document.getElementById('btn-channel-info-leave').addEventListener('click', () => {	//leave channel

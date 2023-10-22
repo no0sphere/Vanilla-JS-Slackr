@@ -85,7 +85,13 @@
                       <button id="btn-channel-info-leave" class="hidden">leave channel</button>
                   </div>
                   <div id="channel-chatroom">
-
+                      <div id="loader" class="hidden">loading...</div>
+                  </div>
+                  <div id="message-input-bar">
+                      <form>
+                            <input id="message-input" />
+                            <button id="btn-send-message">Send</button>
+                      </form>
                   </div>
               </div>
           </div>
@@ -105,8 +111,8 @@
                       <label class="form-check-label" for="private-check">Create it as a private channel</label>
                   </div>
                   <div class="mb-3">
-                      <label for="channel-discription" class="form-label">Discription for channel</label>
-                      <textarea rows="5" cols="30" type="text" class="form-control" id="channel-description">Too lazy to discribe.</textarea> 
+                      <label for="channel-description" class="form-label">Description for channel</label>
+                      <textarea rows="5" cols="30" type="text" class="form-control" id="channel-description">Too lazy to describe.</textarea> 
                   </div>
                   <button type="submit" class="btn btn-primary" id="creating-channel-submit">Submit</button>
               </form>
@@ -144,8 +150,8 @@
                       <div id="new-channel-name-help" class="form-text">Name of your channel.</div>
                   </div>
                   <div class="mb-3">
-                      <label for="new-channel-discription" class="form-label">New Discription for channel</label>
-                      <textarea rows="5" cols="30" type="text" class="form-control" id="new-channel-description">Too lazy to discribe.</textarea>
+                      <label for="new-channel-description" class="form-label">New Description for channel</label>
+                      <textarea rows="5" cols="30" type="text" class="form-control" id="new-channel-description">Too lazy to describe.</textarea>
                   </div>
                   <button type="submit" class="btn btn-primary" id="editing-channel-submit">Submit</button>
               </form>

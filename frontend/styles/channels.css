@@ -83,6 +83,12 @@
     z-index: 2;
 }
 
+#channel-chatroom {
+    height: 70vh;
+    overflow-y: auto;
+}
+
+
 .hidden {
     display: none;
 }

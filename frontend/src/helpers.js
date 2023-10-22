@@ -56,3 +56,12 @@ export const clearChildren = (element) => {
         element.removeChild(element.lastChild);
     }
 }
+
+export const insertAsFirstChild = (parentElement, newChild) => {
+
+    if (parentElement.firstChild) {
+        parentElement.insertBefore(newChild, parentElement.firstChild);
+    } else {
+        parentElement.appendChild(newChild);
+    }
+}
