@@ -83,6 +83,30 @@ const apiCallPut2 = (path, body, authed = false) => {
 	});
 }
 
+const apiCallDelete2 = (path, body, authed = false) => {
+	return new Promise((callbackSuccess, callbackError) => {
+		fetch(`http://localhost:5005/${path}`, {
+			method: 'DELETE',
+			body: JSON.stringify(body),
+			headers: {
+				'Content-type': 'application/json',
+				'Authorization': authed ? `Bearer ${globalToken}` : undefined
+			}
+		})
+			.then((response) => response.json())
+			.then((body) => {
+				console.log(body);
+				if (body.error) {
+					callbackError(body.error);
+				} else {
+					callbackSuccess(body);
+				}
+			});
+	});
+}
+
+
+
 let current_channel_id = null;
 let current_channel_members = {};
 let current_channel_messages_count = 0;
@@ -90,8 +114,9 @@ let current_channel_messages_count = 0;
 
 
 document.getElementById('channel-chatroom').addEventListener('scroll', () => {
+
 	const chatroom_scroll = document.getElementById('channel-chatroom');
-	if (chatroom_scroll.scrollTop <= 0) { // 5px from the top
+	if (chatroom_scroll.scrollTop <= 0) { // 0px from the top
 		loadMoreMessages();
 	}
 });
@@ -106,14 +131,17 @@ const loadMoreMessages = () => {
 	loader_text.setAttribute("style", "text-align: center; margin-top: 10px;");
     loader.appendChild(loader_text);
 
+	const old_scroll_height = document.getElementById('channel-chatroom').scrollHeight;
 	// Display the loader
 	insertAsFirstChild(message_list, loader);
 	loader.style.display = 'block';
+
 
 	apiCallGet2(`message/${current_channel_id}?start=${current_channel_messages_count}`, {}, true) //load more messages
 		.then(body => {
 			console.log(body);
 			loader.style.display = 'none';
+
 			document.getElementById('message-input-bar').style.display = 'block';
 			const message_list = document.getElementById("channel-chatroom");
 			body.messages.forEach(message => {
@@ -136,9 +164,62 @@ const loadMoreMessages = () => {
 				const message_content_sender_name = document.createElement("h7");
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
+				if (message.edited) { //check if message is edited
+					const edited_date = new Date(message.editedAt);
+					current_message_content_time.innerText += ` (edited at ${edited_date.toLocaleDateString()} ${edited_date.toLocaleTimeString()})`;
+				}
 
 				if (message.sender === globalUserId) {
 					current_message_content.setAttribute("style", "background-color: #e6e6e6; border-radius: 10px; padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 10px; margin-bottom: 10px; color: green;");
+
+					const message_edit_button = document.createElement("button"); // edit message button
+					message_edit_button.setAttribute("class", "message-edit-button");
+					message_edit_button.setAttribute("id", `ME${message.id}`);
+					message_edit_button.innerText = "Edit";
+					message_edit_button.addEventListener('click', () => {
+						document.getElementById('message-editing').style.display = 'block';
+						document.getElementById('edited-message').value = message.message;
+						document.getElementById('editing-message-submit').addEventListener('click', () => {
+							const new_message = document.getElementById('edited-message').value;
+							if (new_message.trim() === "") { // check if message is empty or only contains spaces
+								showErrorPopup("Message cannot be empty");
+								return;
+							}
+							else if (new_message === message.message) {
+								showErrorPopup("Message cannot be the same");
+								return;
+							}
+							else {
+								const avatar = "./assets/default_avatar.jpg"; // if user doesn't upload avatar, use default avatar
+								apiCallPut2(`message/${current_channel_id}/${message.id}`, {
+									message: new_message,
+									image: avatar
+								}, true)
+									.then(() => {
+										document.getElementById('message-editing').style.display = 'none';
+										loadMessages();
+									})
+									.catch((msg) => {
+										showErrorPopup(msg);
+									});
+							}
+						});
+					});
+					const message_delete_button = document.createElement("button");  //delete message button
+					message_delete_button.setAttribute("class", "message-delete-button");
+					message_delete_button.setAttribute("id", `DM${message.id}`);
+					message_delete_button.innerText = "Delete";
+					message_delete_button.addEventListener('click', () => {
+						apiCallDelete2(`message/${current_channel_id}/${message.id}`, {}, true)
+							.then(() => {
+								loadMessages();
+							})
+							.catch((msg) => {
+								showErrorPopup(msg);
+							});
+					});
+					current_message_content.appendChild(message_edit_button);
+					current_message_content.appendChild(message_delete_button);
 				}
 
 				if (message.sender in current_channel_members) {  //Change sender id to name
@@ -161,10 +242,12 @@ const loadMoreMessages = () => {
 				insertAsFirstChild(message_list, current_message);
 			});
 		})
+		.then(() => {
+			document.getElementById('channel-chatroom').scrollTop = document.getElementById('channel-chatroom').scrollHeight - old_scroll_height; // because of async, we need to scroll after loading messages
+        })
 		.catch((msg) => {
 			showErrorPopup(msg);
 		});
-
 
 }
 
@@ -196,9 +279,63 @@ const loadMessages = () => {
 				const message_content_sender_name = document.createElement("h7");
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
+				if (message.edited) { //check if message is edited
+					const edited_date = new Date(message.editedAt);
+					current_message_content_time.innerText += ` (edited at ${edited_date.toLocaleDateString()} ${edited_date.toLocaleTimeString()})`;
+                }
+				
 
 				if (message.sender === globalUserId) {
 					current_message_content.setAttribute("style", "background-color: #e6e6e6; border-radius: 10px; padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 10px; margin-bottom: 10px; color: green;");
+
+					const message_edit_button = document.createElement("button"); // edit message button
+					message_edit_button.setAttribute("class", "message-edit-button");
+					message_edit_button.setAttribute("id", `ME${message.id}`);
+					message_edit_button.innerText = "Edit";
+					message_edit_button.addEventListener('click', () => {	
+						document.getElementById('message-editing').style.display = 'block';
+						document.getElementById('edited-message').value = message.message;
+						document.getElementById('editing-message-submit').addEventListener('click', () => {
+							const new_message = document.getElementById('edited-message').value;
+							if (new_message.trim() === "") { // check if message is empty or only contains spaces
+								showErrorPopup("Message cannot be empty");
+								return;
+							}
+							else if (new_message === message.message) {
+								showErrorPopup("Message cannot be the same");
+								return;
+							}
+							else {
+								const avatar = "./assets/default_avatar.jpg"; // if user doesn't upload avatar, use default avatar
+								apiCallPut2(`message/${current_channel_id}/${message.id}`, {
+									message: new_message,
+									image: avatar
+								}, true)
+									.then(() => {
+										document.getElementById('message-editing').style.display = 'none';
+										loadMessages();
+									})
+									.catch((msg) => {
+										showErrorPopup(msg);
+									});
+							}
+						});
+					});
+					const message_delete_button = document.createElement("button");  //delete message button
+					message_delete_button.setAttribute("class", "message-delete-button");
+					message_delete_button.setAttribute("id", `DM${message.id}`);
+					message_delete_button.innerText = "Delete";
+					message_delete_button.addEventListener('click', () => {
+						apiCallDelete2(`message/${current_channel_id}/${message.id}`, {}, true)
+							.then(() => {
+								loadMessages();
+							})
+							.catch((msg) => {
+								showErrorPopup(msg);
+							});
+					});
+					current_message_content.appendChild(message_edit_button);
+					current_message_content.appendChild(message_delete_button);
 				}
 
 				if (message.sender in current_channel_members) {  //Change sender id to name
@@ -294,9 +431,11 @@ document.getElementById('btn-send-message').addEventListener('click', () => {	//
 	if (message.trim() === "") { // check if message is empty or only contains spaces
 		showErrorPopup("Message cannot be empty");
         return;
-    }
+	}
+	const avatar = "./assets/default_avatar.jpg"; // if user doesn't upload avatar, use default avatar
 	apiCallPost2(`message/${current_channel_id}`, {
 		message: message,
+		image: avatar
 	}, true)
 		.then(() => {
 			document.getElementById('message-input').value = "";

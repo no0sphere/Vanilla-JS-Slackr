@@ -163,6 +163,20 @@
           </div>
       </div>
 
+      <div id="message-editing" class="hidden popup">
+          <div id="message-editing-content">
+              <button id="close-editing-message-PopupBtn">X</button>
+              <form>
+                  <div class="mb-3">
+                      <label for="edited-message" class="form-label">Updated Message</label>
+                      <input type="text" class="form-control" id="edited-message" aria-describedby="edited-message-help">
+                      <div id="edited-message-help" class="form-text">Update your message.</div>
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="editing-message-submit">Submit</button>
+              </form>
+          </div>
+      </div>
+
   </main>
   <footer>
     <p>&copy; Slackr</p>
