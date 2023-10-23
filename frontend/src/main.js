@@ -1,4 +1,4 @@
-import { BACKEND_PORT } from './config.js';
+﻿import { BACKEND_PORT } from './config.js';
 // A helper you may want to use when uploading new images to the server.
 import {
 	fileToDataUrl,
@@ -164,6 +164,16 @@ const loadMoreMessages = () => {
 				const message_content_sender_name = document.createElement("h7");
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
+
+				const message_react_container_bar = document.createElement("div");		//message react bar
+				message_react_container_bar.setAttribute("class", "message-react-container-bar");
+				message_react_container_bar.setAttribute("style", "display: flex; flex-direction: row; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; align-items: center; justify-content: flex-end;");
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "thumbs_up", "👍"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "thumbs_down", "👎"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "laugh", "😂"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "heart", "❤️"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "rocket", "🚀"));
+
 				if (message.edited) { //check if message is edited
 					const edited_date = new Date(message.editedAt);
 					current_message_content_time.innerText += ` (edited at ${edited_date.toLocaleDateString()} ${edited_date.toLocaleTimeString()})`;
@@ -238,6 +248,7 @@ const loadMoreMessages = () => {
 				message_content_sender.appendChild(message_content_sender_name);
 				message_content_sender.appendChild(current_message_content_time);
 				current_message_content.appendChild(current_message_content_text);
+				current_message_content.appendChild(message_react_container_bar);
 				current_message.appendChild(current_message_content);
 				insertAsFirstChild(message_list, current_message);
 			});
@@ -250,6 +261,62 @@ const loadMoreMessages = () => {
 		});
 
 }
+
+const message_reaction = (message_id, message_reacts, reaction, emoji) => {
+	const message_react_container = document.createElement("div");
+	message_react_container.setAttribute("class", "message-react-container");
+	const message_react_btn = document.createElement("button");
+	message_react_btn.setAttribute("class", "message-react-btn");
+	message_react_btn.innerText = `${emoji}`;
+	let message_react_count = document.createElement("p");
+	message_react_count.setAttribute("class", "message-react-count");
+	message_react_count.innerText = message_reacts.filter(react => react.react === reaction).length;
+	message_react_container.appendChild(message_react_btn);
+	message_react_container.appendChild(message_react_count);
+
+	let isUserReacted = false;
+	if (message_reacts.some(reactObj => reactObj.react === reaction && reactObj.user === globalUserId)) {    //check if user has reacted
+		isUserReacted = true;
+		message_react_btn.setAttribute("style", "background-color: blue;");
+	}
+    
+	else {
+		isUserReacted = false;
+	}
+	message_react_btn.addEventListener('click', () => {
+		if (isUserReacted) {	//unreact
+			apiCallPost2(`message/unreact/${current_channel_id}/${message_id}`, {
+				"react": reaction,
+				"user": globalUserId
+			}, true)
+				.then(() => {
+					message_react_btn.setAttribute("style", "background-color: white;");
+					message_react_count.innerText = parseInt(message_react_count.innerText) - 1;
+					isUserReacted = false;
+				})
+				.catch((msg) => {
+					showErrorPopup(msg);
+				});
+		}
+		else {	//react
+			apiCallPost2(`message/react/${current_channel_id}/${message_id}`, {
+				"react": reaction,
+				"user": globalUserId
+			}, true)
+				.then(() => {
+					message_react_btn.setAttribute("style", "background-color: blue;");
+					message_react_count.innerText = parseInt(message_react_count.innerText) + 1;
+					isUserReacted = true;
+				})
+				.catch((msg) => {
+					showErrorPopup(msg);
+				});
+		}
+	});
+	return message_react_container;
+}
+
+
 
 const loadMessages = () => {
 	return apiCallGet2(`message/${current_channel_id}?start=0`, {}, true) //load messages
@@ -279,6 +346,17 @@ const loadMessages = () => {
 				const message_content_sender_name = document.createElement("h7");
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
+
+				const message_react_container_bar = document.createElement("div");		//message react bar
+				message_react_container_bar.setAttribute("class", "message-react-container-bar");
+				message_react_container_bar.setAttribute("style", "display: flex; flex-direction: row; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; align-items: center; justify-content: flex-end;");
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "thumbs_up", "👍"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "thumbs_down", "👎"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "laugh", "😂"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "heart", "❤️"));
+				message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "rocket", "🚀"));
+
+
 				if (message.edited) { //check if message is edited
 					const edited_date = new Date(message.editedAt);
 					current_message_content_time.innerText += ` (edited at ${edited_date.toLocaleDateString()} ${edited_date.toLocaleTimeString()})`;
@@ -354,6 +432,7 @@ const loadMessages = () => {
 				message_content_sender.appendChild(message_content_sender_name);
 				message_content_sender.appendChild(current_message_content_time);
 				current_message_content.appendChild(current_message_content_text);
+				current_message_content.appendChild(message_react_container_bar);
 				current_message.appendChild(current_message_content);
 				insertAsFirstChild(message_list, current_message);
 			});
