@@ -517,6 +517,7 @@ const loadDashboard = () => {		//load dashboard
 				}
 				current_channel.addEventListener('click', () => { //check if user is in the channel
 					document.getElementById('channel-screen').style.display = 'block';
+					document.getElementById('btn-channel-info').style.display = 'block';
 					document.getElementById('channel-title-bar-name').textContent = channel.name;
 					current_channel_id = channel.id;
 					if (channel.members.includes(globalUserId)) {  // load messages if user is in the channel
@@ -710,6 +711,131 @@ document.getElementById('pinned_messages_collection_btn').addEventListener('clic
 });
 
 
+document.getElementById('user-info-btn').addEventListener('click', () => {	//close channel-info popup
+	document.getElementById('user-info-popup').style.display = 'block';
+
+	if (globalUserAvatar) {
+		document.getElementById('user-info-avatar').src = globalUserAvatar;
+	}
+	document.getElementById('user-info-name').textContent = globalUserName;
+	document.getElementById('user-info-email').textContent = globalUserEmail
+	document.getElementById('user-info-description').textContent = globalUserDescription;
+
+	document.getElementById('user-info-new-avatar').value = "";
+	document.getElementById('user-info-new-name').value = "";
+	document.getElementById('user-info-new-email').value = "";
+	document.getElementById('user-info-new-description').value = "";
+});
+
+document.getElementById('close-user-info-PopupBtn').addEventListener('click', () => {	//close channel-info popup
+	document.getElementById('user-info-popup').style.display = 'none';
+});
+
+document.getElementById('editing-user-avator-submit').addEventListener('click', () => { //edit user avatar
+
+	const inputFile = document.getElementById('user-info-new-avatar');
+	const upload_avatar = inputFile.files[0];
+
+	if (!upload_avatar) {
+		showErrorPopup("Please select an image to upload.");
+		return;
+	}
+
+	const reader = new FileReader();
+
+	reader.onload = () => {	// activate when file is loaded(readAsDataURL). which is async
+		const new_avatar = reader.result;
+
+		apiCallPut2(`user`, {
+			image: new_avatar
+		}, true)
+			.then(() => {
+				document.getElementById('user-info-popup').style.display = 'none';
+				globalUserAvatar = new_avatar;
+				loadDashboard();
+			})
+			.catch((msg) => {
+				showErrorPopup(msg);
+			});
+	};
+
+	reader.readAsDataURL(upload_avatar); // convert to base64 string
+});
+
+
+document.getElementById('editing-user-password-submit').addEventListener('click', () => {	//edit user password
+	const new_password = document.getElementById('user-info-new-password').value;
+	apiCallPut2(`user`, {
+		password: new_password,
+	}, true)
+		.then(() => {
+			document.getElementById('user-info-popup').style.display = 'none';
+			loadDashboard();
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+
+});
+
+document.getElementById('editing-user-name-submit').addEventListener('click', () => {	//edit user name
+	const new_name = document.getElementById('user-info-new-name').value;
+	apiCallPut2(`user`, {
+		name: new_name,
+	}, true)
+		.then(() => {
+			document.getElementById('user-info-popup').style.display = 'none';
+			globalUserName = new_name;
+			loadDashboard();
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+});
+
+document.getElementById('editing-user-email-submit').addEventListener('click', () => {	//edit user email
+	const new_email = document.getElementById('user-info-new-email').value;
+	apiCallPut2(`user`, {
+		email: new_email,
+	}, true)
+		.then(() => {
+			document.getElementById('user-info-popup').style.display = 'none';
+			globalUserEmail = new_email;
+			loadDashboard();
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+});
+
+document.getElementById('editing-user-description-submit').addEventListener('click', () => {	//edit user description
+	const new_description = document.getElementById('user-info-new-description').value;
+	apiCallPut2(`user`, {
+		bio: new_description,
+	}, true)
+		.then(() => {
+			document.getElementById('user-info-popup').style.display = 'none';
+			globalUserDescription = new_description;
+			loadDashboard();
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+});
+
+document.getElementById('editing-user-show-password-btn').addEventListener('click', () => {	//show user password
+	if (document.getElementById('user-info-new-password').type === "password") {
+		document.getElementById('user-info-new-password').type = "text";
+		document.getElementById('editing-user-show-password-btn').innerText = "Hide Password";
+	}
+	else {
+		document.getElementById('user-info-new-password').type = "password";
+		document.getElementById('editing-user-show-password-btn').innerText = "Show Password";
+	}
+});
+
+
+
 
 
 document.getElementById('btn-send-message').addEventListener('click', () => {	//send message
@@ -718,7 +844,10 @@ document.getElementById('btn-send-message').addEventListener('click', () => {	//
 		showErrorPopup("Message cannot be empty");
         return;
 	}
-	const avatar = "./assets/default_avatar.jpg"; // if user doesn't upload avatar, use default avatar
+	let avatar = "./assets/default_avatar.jpg"; // if user doesn't upload avatar, use default avatar
+	if (globalUserAvatar) {
+		avatar = globalUserAvatar;
+	}
 	apiCallPost2(`message/${current_channel_id}`, {
 		message: message,
 		image: avatar
@@ -825,6 +954,11 @@ document.getElementById('close-channel-info-PopupBtn').addEventListener('click',
 	document.getElementById('channel-info-popup').style.display = 'none';
 });
 
+let globalUserName = null;
+let globalUserEmail = null;
+let globalUserDescription = null;
+let globalUserAvatar = null;
+
 const showPage = (pageName) => {
 	for (const page of document.querySelectorAll('.page-block')) {
 		page.style.display = 'none';
@@ -832,6 +966,22 @@ const showPage = (pageName) => {
 	document.getElementById(`page-${pageName}`).style.display = 'block';
 	if (pageName === 'dashboard') {
 		loadDashboard();
+		apiCallGet2(`user/${globalUserId}`, {}, true)
+			.then(body => {
+				console.log(body);
+				globalUserName = body.name;
+				globalUserEmail = body.email;
+				globalUserDescription = body.bio;
+				if (body.image) {
+					globalUserAvatar = body.image;
+				}
+				else {
+					globalUserAvatar = null;
+				}
+			})
+			.catch((msg) => {
+				showErrorPopup(msg);
+			});
 	}
 }
 
