@@ -116,7 +116,7 @@ let current_channel_messages_count = 0;
 document.getElementById('channel-chatroom').addEventListener('scroll', () => {
 
 	const chatroom_scroll = document.getElementById('channel-chatroom');
-	if (chatroom_scroll.scrollTop <= 0) { // 0px from the top
+	if ((current_channel_id !== -1) && (chatroom_scroll.scrollTop <= 0)) { // 0px from the top
 		loadMoreMessages();
 	}
 });
@@ -164,6 +164,11 @@ const loadMoreMessages = () => {
 				const message_content_sender_name = document.createElement("h7");
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
+
+				const message_pin_btn = document.createElement("button"); // pin message button
+				message_pin_btn.setAttribute("class", "message-pin-button");
+				message_pin_btn.innerText = "📌";
+				current_message_content.appendChild(message_pin(message.id, message.pinned, message_pin_btn));
 
 				const message_react_container_bar = document.createElement("div");		//message react bar
 				message_react_container_bar.setAttribute("class", "message-react-container-bar");
@@ -316,6 +321,41 @@ const message_reaction = (message_id, message_reacts, reaction, emoji) => {
 	return message_react_container;
 }
 
+const message_pin = (message_id, pre_status, pin_btn) => {
+	let current_status = pre_status;
+	if (current_status === true) {
+		pin_btn.setAttribute("style", "background-color: blue;");
+	}
+	else {
+		pin_btn.setAttribute("style", "background-color: white;");
+    }
+	pin_btn.addEventListener('click', () => {
+		if (current_status === false) {
+			apiCallPost2(`message/pin/${current_channel_id}/${message_id}`, {}, true)
+				.then(() => {
+					pin_btn.setAttribute("style", "background-color: blue;");
+					current_status = true;
+				})
+				.catch((msg) => {
+					showErrorPopup(msg);
+				});
+		}
+		else {
+			apiCallPost2(`message/unpin/${current_channel_id}/${message_id}`, {}, true)
+				.then(() => {
+					pin_btn.setAttribute("style", "background-color: white;");
+					current_status = false;
+				})
+				.catch((msg) => {
+					showErrorPopup(msg);
+				});
+		}
+	});
+	return pin_btn;
+}
+
+
+
 
 
 const loadMessages = () => {
@@ -347,6 +387,12 @@ const loadMessages = () => {
 				message_content_sender_name.setAttribute("class", "message-sender_name");
 				message_content_sender_name.innerText = message.sender;
 
+				const message_pin_btn = document.createElement("button"); // pin message button
+				message_pin_btn.setAttribute("class", "message-pin-button");
+				message_pin_btn.innerText = "📌";
+				current_message_content.appendChild(message_pin(message.id, message.pinned, message_pin_btn));
+
+
 				const message_react_container_bar = document.createElement("div");		//message react bar
 				message_react_container_bar.setAttribute("class", "message-react-container-bar");
 				message_react_container_bar.setAttribute("style", "display: flex; flex-direction: row; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; align-items: center; justify-content: flex-end;");
@@ -364,7 +410,7 @@ const loadMessages = () => {
 				
 
 				if (message.sender === globalUserId) {
-					current_message_content.setAttribute("style", "background-color: #e6e6e6; border-radius: 10px; padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 10px; margin-bottom: 10px; color: green;");
+					current_message_content.style.color = "green";
 
 					const message_edit_button = document.createElement("button"); // edit message button
 					message_edit_button.setAttribute("class", "message-edit-button");
@@ -503,6 +549,167 @@ const loadDashboard = () => {		//load dashboard
 
 		});
 };
+
+//we can delete "if (message.pinned)" to get all messages in channel
+const pinned_messages_in_channel = (channel_id, loop_count, messages_index, pre_messages_count) => {	//get pinned messages in channel
+	if ((loop_count === 0) || (pre_messages_count >= 25)) {
+		apiCallGet2(`message/${channel_id}?start=${messages_index}`, {}, true)
+			.then(body_messages => {
+				loop_count += 1;
+				messages_index += body_messages.messages.length;
+				pre_messages_count = body_messages.messages.length;
+				console.log(body_messages.messages.length);
+				body_messages.messages.forEach(message => {
+					if (message.pinned) {  //check if message is pinned.
+						const message_list = document.getElementById("channel-chatroom");
+						const channel_from = document.createElement("div");
+						channel_from.setAttribute("class", "channel-from");
+						channel_from.innerText = ` From channel #${channel_id}`;
+						const current_message = document.createElement("div");
+						current_message.setAttribute("class", "message");
+						const current_message_content = document.createElement("div");
+						current_message_content.setAttribute("class", "message-content");
+						const current_message_content_text = document.createElement("p");
+						current_message_content_text.setAttribute("class", "message-text");
+						current_message_content_text.innerText = message.message;
+						const current_message_content_time = document.createElement("p");
+						current_message_content_time.setAttribute("class", "message-time");
+						const date = new Date(message.sentAt);
+						current_message_content_time.innerText = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+						current_message_content_time.setAttribute("style", "margin-left: 20px;");
+						const message_content_sender = document.createElement("div");
+						message_content_sender.setAttribute("class", "message-sender");
+						message_content_sender.setAttribute("style", "display: flex; flex-direction: row; font-weight: bold;")
+						const message_content_sender_name = document.createElement("h7");
+						message_content_sender_name.setAttribute("class", "message-sender_name");
+						message_content_sender_name.innerText = message.sender;
+
+						const message_pin_btn = document.createElement("button"); // pin message button
+						message_pin_btn.setAttribute("class", "message-pin-button");
+						message_pin_btn.innerText = "📌";
+						current_message_content.appendChild(message_pin(message.id, message.pinned, message_pin_btn));
+
+						const message_react_container_bar = document.createElement("div");		//message react bar
+						message_react_container_bar.setAttribute("class", "message-react-container-bar");
+						message_react_container_bar.setAttribute("style", "display: flex; flex-direction: row; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; align-items: center; justify-content: flex-end;");
+						message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "thumbs_up", "👍"));
+						message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "thumbs_down", "👎"));
+						message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "laugh", "😂"));
+						message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "heart", "❤️"));
+						message_react_container_bar.appendChild(message_reaction(message.id, message.reacts, "rocket", "🚀"));
+
+						if (message.edited) { //check if message is edited
+							const edited_date = new Date(message.editedAt);
+							current_message_content_time.innerText += ` (edited at ${edited_date.toLocaleDateString()} ${edited_date.toLocaleTimeString()})`;
+						}
+
+						if (message.sender === globalUserId) {
+							current_message_content.setAttribute("style", "background-color: #e6e6e6; border-radius: 10px; padding: 10px; margin-left: 20px; margin-right: 20px; margin-top: 10px; margin-bottom: 10px; color: green;");
+
+							const message_edit_button = document.createElement("button"); // edit message button
+							message_edit_button.setAttribute("class", "message-edit-button");
+							message_edit_button.setAttribute("id", `ME${message.id}`);
+							message_edit_button.innerText = "Edit";
+							message_edit_button.addEventListener('click', () => {
+								document.getElementById('message-editing').style.display = 'block';
+								document.getElementById('edited-message').value = message.message;
+								document.getElementById('editing-message-submit').addEventListener('click', () => {
+									const new_message = document.getElementById('edited-message').value;
+									if (new_message.trim() === "") { // check if message is empty or only contains spaces
+										showErrorPopup("Message cannot be empty");
+										return;
+									}
+									else if (new_message === message.message) {
+										showErrorPopup("Message cannot be the same");
+										return;
+									}
+									else {
+										const avatar = "./assets/default_avatar.jpg"; // if user doesn't upload avatar, use default avatar
+										apiCallPut2(`message/${current_channel_id}/${message.id}`, {
+											message: new_message,
+											image: avatar
+										}, true)
+											.then(() => {
+												document.getElementById('message-editing').style.display = 'none';
+												loadMessages();
+											})
+											.catch((msg) => {
+												showErrorPopup(msg);
+											});
+									}
+								});
+							});
+							const message_delete_button = document.createElement("button");  //delete message button
+							message_delete_button.setAttribute("class", "message-delete-button");
+							message_delete_button.setAttribute("id", `DM${message.id}`);
+							message_delete_button.innerText = "Delete";
+							message_delete_button.addEventListener('click', () => {
+								apiCallDelete2(`message/${current_channel_id}/${message.id}`, {}, true)
+									.then(() => {
+										loadMessages();
+									})
+									.catch((msg) => {
+										showErrorPopup(msg);
+									});
+							});
+							current_message_content.appendChild(message_edit_button);
+							current_message_content.appendChild(message_delete_button);
+						}
+
+						if (message.sender in current_channel_members) {  //Change sender id to name
+							message_content_sender_name.innerText = current_channel_members[message.sender];
+						}
+						const message_content_sender_avatar = document.createElement("img");
+						message_content_sender_avatar.setAttribute("class", "message-user-avatar");
+						message_content_sender_avatar.setAttribute("src", "./assets/default_avatar.jpg");
+						message_content_sender_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
+
+						if (message.image) {
+							message_content_sender_avatar.setAttribute("src", message.image);
+						};
+						current_message_content.appendChild(channel_from);
+						current_message_content.appendChild(message_content_sender);
+						message_content_sender.appendChild(message_content_sender_avatar);
+						message_content_sender.appendChild(message_content_sender_name);
+						message_content_sender.appendChild(current_message_content_time);
+						current_message_content.appendChild(current_message_content_text);
+						current_message_content.appendChild(message_react_container_bar);
+						current_message.appendChild(current_message_content);
+						insertAsFirstChild(message_list, current_message);
+					}
+
+				});
+				pinned_messages_in_channel(channel_id, loop_count, messages_index, pre_messages_count);
+			})
+			.catch((msg) => {
+				showErrorPopup(msg);
+			});
+	}
+}
+
+document.getElementById('pinned_messages_collection_btn').addEventListener('click', () => {			//load pinned messages
+	current_channel_id = -1;
+	document.getElementById('channel-screen').style.display = 'block';
+	document.getElementById('channel-title-bar-name').textContent = "Pinned Message";
+	document.getElementById('btn-channel-info-leave').style.display = 'none';
+	document.getElementById('btn-channel-info-join').style.display = 'none';
+	document.getElementById('btn-channel-info').style.display = 'none';
+	document.getElementById('message-input-bar').style.display = 'none';
+	clearChildren(document.getElementById("channel-chatroom"));
+	apiCallGet2('channel', {}, true)
+		.then(body => {
+			body.channels.forEach(channel => {
+				if (channel.members.includes(globalUserId)) {
+					pinned_messages_in_channel(channel.id, 0, 0, 0);
+				};
+			});
+		})
+		.catch((msg) => {
+			showErrorPopup(msg);
+		});
+});
+
+
 
 
 document.getElementById('btn-send-message').addEventListener('click', () => {	//send message
