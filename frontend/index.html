@@ -90,6 +90,7 @@
                   <div id="channel-title-bar">
                       <h3 id="channel-title-bar-name"></h3>
                       <button id="btn-channel-info">info</button>
+                      <button id="btn-channel-info-invite">invite</button>
                       <button id="btn-channel-info-join" class="hidden">join channel</button>
                       <button id="btn-channel-info-leave" class="hidden">leave channel</button>
                   </div>
@@ -99,7 +100,11 @@
                   <div id="message-input-bar">
                       <form>
                           <input id="message-input" />
-                          <button id="btn-send-message">Send</button>
+                          <button id="btn-send-message">Send Message</button>
+                      </form>
+                      <form>
+                          <input type="file" accept="image/*" id="message-input-image" />
+                          <button id="btn-send-image">Send Image</button>
                       </form>
                   </div>
               </div>
@@ -168,10 +173,14 @@
       </div>
 
       <div id="user-info-popup" class="popup">
-          <div id="channel-info-content">
+          <div id="user-info-content">
               <button id="close-user-info-PopupBtn">X</button>
               <div id="user-info">
                   <div>
+                      <div>
+                          <h3>User ID:</h3>
+                          <p id="user-info-id"></p>
+                      </div>
                       <h3>User Avatar:</h3>
                       <img src="/assets/default_avatar.jpg" id="user-info-avatar" alt="avatar" style="width: 60px; height: 60px; border-radius: 60%" />
                       <form>
@@ -214,9 +223,42 @@
           </div>
       </div>
 
-      <div id="message-editing" class="hidden popup">
+      <div id="sender-info-popup" class="popup">
+          <div id="sender-info-content">
+              <button id="close-sender-info-PopupBtn">X</button>
+              <div id="sender-info">
+                  <div>
+                      <h3>User Avatar:</h3>
+                      <img src="/assets/default_avatar.jpg" id="sender-info-avatar" alt="avatar" style="width: 60px; height: 60px; border-radius: 60%" />
+                  </div>
+                  <div>
+                      <h3>User Name:</h3>
+                      <p id="sender-info-name"></p>
+                  </div>
+                  <div>
+                      <h3>User Email:</h3>
+                      <p id="sender-info-email"></p>
+                  </div>
+                  <div>
+                      <h3>User Description:</h3>
+                      <p id="sender-info-description"></p>
+                  </div>
+
+              </div>
+          </div>
+      </div>
+
+      <div id="message-editing" class="popup">
           <div id="message-editing-content">
               <button id="close-editing-message-PopupBtn">X</button>
+              <div>
+                  <h3>Message ID:</h3>
+                  <p id="editing-message-id"></p>
+              </div>
+              <div>
+                  <h3>Old Message:</h3>
+                  <p id="editing-message-old"></p>
+              </div>
               <form>
                   <div class="mb-3">
                       <label for="edited-message" class="form-label">Updated Message</label>
@@ -225,8 +267,43 @@
                   </div>
                   <button type="submit" class="btn btn-primary" id="editing-message-submit">Submit</button>
               </form>
+              <form>
+                  <div class="mb-3">
+                      <label for="edited-image-message" class="form-label">Updated Image Message</label>
+                      <input type="file" accept="image/*" class="form-control" id="edited-image-message" aria-describedby="edited-image-message-help">
+                      <div id="edited-image-message-help" class="form-text">Update your Image message.</div>
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="editing-image-message-submit">Submit</button>
+              </form>
           </div>
       </div>
+
+      <div id="channel-inviting" class="popup">
+          <div id="channel-inviting-content">
+              <button id="close-channel-inviting-PopupBtn">X</button>
+              <form>
+                  <div id="channel-inviting-users-list" class="mb-3 overflow-container">
+
+                  </div>
+                  <button type="submit" class="btn btn-primary" id="channel-inviting-submit">Submit</button>
+              </form>
+          </div>
+      </div>
+
+      <div id="channel-image-checking" class="popup">
+          <div id="channel-image-checking-content">
+              <div>
+                  <button id="close-channel-image-checking-PopupBtn">X</button>
+              </div>
+              <div id="channel-image-checking-container">
+                  <button id="channel-image-checking-last">&larr;</button>
+                    <img id="channel-image-checking-current">
+                  <button id="channel-image-checking-next">&rarr;</button>
+              </div>
+          </div>
+      </div>
+
+
 
   </main>
   <footer>
