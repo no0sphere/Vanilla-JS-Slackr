@@ -112,6 +112,31 @@ let short_memo_channel_members = {};
 let short_memo_channel_members_avatar = {};
 let current_channel_messages_count = 0;
 
+let current_channel_image_queue = [];
+let current_channel_image_queue_index = 0;
+document.getElementById('channel-image-checking-previous').addEventListener('click', (event) => { //check previous image
+	event.stopPropagation();	//stop event bubbling
+	if (current_channel_image_queue_index < current_channel_image_queue.length - 1) {
+		current_channel_image_queue_index += 1;
+		document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+	}
+	else {
+        current_channel_image_queue_index = 0;
+        document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+    }
+});
+document.getElementById('channel-image-checking-next').addEventListener('click', (event) => { //check next image
+	event.stopPropagation();	//stop event bubbling
+	if (current_channel_image_queue_index > 0) {
+		current_channel_image_queue_index -= 1;
+		document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+	}
+	else {
+		current_channel_image_queue_index = current_channel_image_queue.length - 1;
+		document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+	}
+});
+
 
 
 document.getElementById('channel-chatroom').addEventListener('scroll', () => {
@@ -264,6 +289,14 @@ const loadMoreMessages = () => {
 					const current_message_content_image = document.createElement("img");
 					current_message_content_image.setAttribute("class", "message-image");
 					current_message_content_image.setAttribute("src", message.image);
+					current_message_content_image.setAttribute("id", `image${message.id}`);
+					current_channel_image_queue.push(`image${message.id}`);
+					const current_message_content_image_index = current_channel_image_queue.length - 1;
+					current_message_content_image.addEventListener('click', () => { //check image popup
+						document.getElementById('channel-image-checking').style.display = 'block';
+						current_channel_image_queue_index = current_message_content_image_index;
+						document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+					});
 					current_message_content.appendChild(current_message_content_image);
 				}
 				current_message_content.appendChild(message_react_container_bar);
@@ -377,7 +410,9 @@ const loadMessages = () => {
 			document.getElementById('message-input-bar').style.display = 'block';
 			const message_list = document.getElementById("channel-chatroom");
 			clearChildren(message_list);
-			current_channel_messages_count = 0; 
+			current_channel_messages_count = 0;
+			current_channel_image_queue = [];
+			current_channel_image_queue_index = 0;
 			body.messages.forEach(message => {
 				current_channel_messages_count += 1;
 				const current_message = document.createElement("div");
@@ -500,6 +535,15 @@ const loadMessages = () => {
 					const current_message_content_image = document.createElement("img");
 					current_message_content_image.setAttribute("class", "message-image");
 					current_message_content_image.setAttribute("src", message.image);
+					current_message_content_image.setAttribute("id", `image${message.id}`);
+					current_message_content_image.setAttribute("id", `image${message.id}`);
+					current_channel_image_queue.push(`image${message.id}`);
+					const current_message_content_image_index = current_channel_image_queue.length - 1;
+					current_message_content_image.addEventListener('click', () => { //check image popup
+						document.getElementById('channel-image-checking').style.display = 'block';
+						current_channel_image_queue_index = current_message_content_image_index;
+						document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+					});
 					current_message_content.appendChild(current_message_content_image);
 				}
 				current_message_content.appendChild(message_react_container_bar);
@@ -715,6 +759,14 @@ const pinned_messages_in_channel = (channel_id, loop_count, messages_index, pre_
 							const current_message_content_image = document.createElement("img");
 							current_message_content_image.setAttribute("class", "message-image");
 							current_message_content_image.setAttribute("src", message.image);
+							current_message_content_image.setAttribute("id", `image${message.id}`);
+							current_channel_image_queue.push(`image${message.id}`);
+							const current_message_content_image_index = current_channel_image_queue.length - 1;
+							current_message_content_image.addEventListener('click', () => { //check image popup
+								document.getElementById('channel-image-checking').style.display = 'block';
+								current_channel_image_queue_index = current_message_content_image_index;
+								document.getElementById('channel-image-checking-current').src = document.getElementById(current_channel_image_queue[current_channel_image_queue_index]).src;
+							});
 							current_message_content.appendChild(current_message_content_image);
 						}
 						current_message_content.appendChild(message_react_container_bar);
@@ -733,6 +785,8 @@ const pinned_messages_in_channel = (channel_id, loop_count, messages_index, pre_
 
 document.getElementById('pinned_messages_collection_btn').addEventListener('click', () => {			//load pinned messages
 	current_channel_id = -1;
+	current_channel_image_queue = [];
+	current_channel_image_queue_index = 0;
 	document.getElementById('channel-screen').style.display = 'block';
 	document.getElementById('channel-title-bar-name').textContent = "Pinned Message";
 	document.getElementById('btn-channel-info-leave').style.display = 'none';
@@ -755,7 +809,7 @@ document.getElementById('pinned_messages_collection_btn').addEventListener('clic
 });
 
 
-document.getElementById('close-channel-image-checking-PopupBtn').addEventListener('click', () => {	//close image checking popup
+document.getElementById('channel-image-checking').addEventListener('click', () => {	//close image checking popup
 	document.getElementById('channel-image-checking').style.display = 'none';
 });
 
@@ -1014,6 +1068,7 @@ document.getElementById('editing-channel-submit').addEventListener('click', () =
 			showErrorPopup(msg);
 		});
 });
+
 
 
 document.getElementById('btn-channel-info-invite').addEventListener('click', () => {	//invite user

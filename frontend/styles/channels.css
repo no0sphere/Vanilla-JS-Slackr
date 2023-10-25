@@ -144,27 +144,18 @@
     overflow-y: auto;
 }
 
+
 #channel-image-checking-content {
     position: absolute;
+    display: flex;
     width: 100%;
     height: 100%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 20px;
-    background-color: transparent;
-    border: 1px solid black;
-    z-index: 2;
-    overflow-y: auto;
-}
-
-#channel-image-checking-container {
-    display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
     background-color: transparent;
     gap: 20px;
+    z-index: 2;
 }
 
 #channel-chatroom {
@@ -190,4 +181,15 @@
 .message-image {
     max-width: 100px;
     max-height: 100px;
+}
+
+#channel-image-checking-current {
+    max-width: 80vh;
+    max-height: 80vh;
+}
+
+.arrow-button {
+    height: 100px;
+    width: 100px;
+    font-size:xx-large;
 }
