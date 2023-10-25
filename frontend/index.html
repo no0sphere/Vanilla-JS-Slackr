@@ -100,11 +100,11 @@
                   <div id="message-input-bar">
                       <form>
                           <input id="message-input" />
-                          <button id="btn-send-message">Send Message</button>
+                          <button type="button" id="btn-send-message">Send Message</button>
                       </form>
                       <form>
                           <input type="file" accept="image/*" id="message-input-image" />
-                          <button id="btn-send-image">Send Image</button>
+                          <button  type="button" id="btn-send-image">Send Image</button>
                       </form>
                   </div>
               </div>
@@ -128,7 +128,7 @@
                       <label for="channel-description" class="form-label">Description for channel</label>
                       <textarea rows="5" cols="30" type="text" class="form-control" id="channel-description">Too lazy to describe.</textarea>
                   </div>
-                  <button type="submit" class="btn btn-primary" id="creating-channel-submit">Submit</button>
+                  <button type="button" class="btn btn-primary" id="creating-channel-submit">Submit</button>
               </form>
           </div>
       </div>
@@ -167,7 +167,7 @@
                       <label for="new-channel-description" class="form-label">New Description for channel</label>
                       <textarea rows="5" cols="30" type="text" class="form-control" id="new-channel-description">Too lazy to describe.</textarea>
                   </div>
-                  <button type="submit" class="btn btn-primary" id="editing-channel-submit">Submit</button>
+                  <button type="button" class="btn btn-primary" id="editing-channel-submit">Submit</button>
               </form>
           </div>
       </div>
@@ -185,13 +185,13 @@
                       <img src="/assets/default_avatar.jpg" id="user-info-avatar" alt="avatar" style="width: 60px; height: 60px; border-radius: 60%" />
                       <form>
                           <input type="file" accept="image/*" class="form-control" id="user-info-new-avatar">
-                          <button type="submit" class="btn btn-primary" id="editing-user-avator-submit">Submit</button>
+                          <button type="button" class="btn btn-primary" id="editing-user-avator-submit">Submit</button>
                       </form>
                       <h3>User Name:</h3>
                       <p id="user-info-name"></p>
                       <form>
                           <input type="text" class="form-control" id="user-info-new-name" value="new name">
-                          <button type="submit" class="btn btn-primary" id="editing-user-name-submit">Submit</button>
+                          <button type="button" class="btn btn-primary" id="editing-user-name-submit">Submit</button>
                       </form>
                   </div>
                   <div>
@@ -199,7 +199,7 @@
                       <p id="user-info-email"></p>
                       <form>
                           <input type="email" class="form-control" id="user-info-new-email" value="new email">
-                          <button type="submit" class="btn btn-primary" id="editing-user-email-submit">Submit</button>
+                          <button type="button" class="btn btn-primary" id="editing-user-email-submit">Submit</button>
                       </form>
                   </div>
                   <div>
@@ -207,7 +207,7 @@
                       <p id="user-info-description"></p>
                       <form>
                           <textarea rows="5" cols="30" type="text" class="form-control" id="user-info-new-description">new description</textarea>
-                          <button type="submit" class="btn btn-primary" id="editing-user-description-submit">Submit</button>
+                          <button type="button" class="btn btn-primary" id="editing-user-description-submit">Submit</button>
                       </form>
                   </div>
                   <div>
@@ -215,7 +215,7 @@
                       <form>
                           <input type="password" class="form-control" id="user-info-new-password">
                           <button type="button" class="btn btn-primary" id="editing-user-show-password-btn">Show Password</button>
-                          <button type="submit" class="btn btn-primary" id="editing-user-password-submit">Submit</button>
+                          <button type="button" class="btn btn-primary" id="editing-user-password-submit">Submit</button>
                       </form>
                   </div>
 
@@ -265,7 +265,7 @@
                       <input type="text" class="form-control" id="edited-message" aria-describedby="edited-message-help">
                       <div id="edited-message-help" class="form-text">Update your message.</div>
                   </div>
-                  <button type="submit" class="btn btn-primary" id="editing-message-submit">Submit</button>
+                  <button type="button" class="btn btn-primary" id="editing-message-submit">Submit</button>
               </form>
               <form>
                   <div class="mb-3">
@@ -273,7 +273,7 @@
                       <input type="file" accept="image/*" class="form-control" id="edited-image-message" aria-describedby="edited-image-message-help">
                       <div id="edited-image-message-help" class="form-text">Update your Image message.</div>
                   </div>
-                  <button type="submit" class="btn btn-primary" id="editing-image-message-submit">Submit</button>
+                  <button type="button" class="btn btn-primary" id="editing-image-message-submit">Submit</button>
               </form>
           </div>
       </div>
@@ -285,7 +285,7 @@
                   <div id="channel-inviting-users-list" class="mb-3 overflow-container">
 
                   </div>
-                  <button type="submit" class="btn btn-primary" id="channel-inviting-submit">Submit</button>
+                  <button type="button" class="btn btn-primary" id="channel-inviting-submit">Submit</button>
               </form>
           </div>
       </div>

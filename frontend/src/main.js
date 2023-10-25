@@ -592,6 +592,7 @@ const loadDashboard = () => {		//load dashboard
 				current_channel.addEventListener('click', () => { //check if user is in the channel
 					document.getElementById('channel-screen').style.display = 'block';
 					document.getElementById('btn-channel-info').style.display = 'block';
+					document.getElementById('btn-channel-info-invite').style.display = 'block';
 					document.getElementById('channel-title-bar-name').textContent = channel.name;
 
 					current_channel_id = channel.id;
