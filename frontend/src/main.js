@@ -561,7 +561,44 @@ document.getElementById('close-sender-info-PopupBtn').addEventListener('click', 
 	document.getElementById('sender-info-popup').style.display = 'none';
 });
 
+let channels_last_messaage_time_dict = {};
+let intervalID = null;	//store interval id
 
+const startPolling = () => {			//check if there is new message
+	intervalID = setInterval(() => {			// check every 1 second
+		const all_channel_list = document.getElementById('all-channels-list');
+		const channels = all_channel_list.querySelectorAll('[data-channel-id]');
+
+		channels.forEach((channel) => {
+			const if_user_in_channel = channel.getAttribute('data-if-in-channel');
+			if (if_user_in_channel === '1') {
+				const channel_id = channel.getAttribute('data-channel-id');
+				apiCallGet2(`message/${channel_id}?start=0`, {}, true)
+					.then(body => {
+						if (body.messages.length > 0 && body.messages[0].sender !== parseInt(globalUserId)) {
+							const date = new Date(body.messages[0].sentAt);
+							if (channel_id in channels_last_messaage_time_dict) {
+								if (date > channels_last_messaage_time_dict[channel_id]) {
+									channels_last_messaage_time_dict[channel_id] = date;
+									channel.style.color = "#E57373";
+								}
+							}
+							else {
+								channels_last_messaage_time_dict[channel_id] = date;
+							}
+						}
+					})
+					.catch((msg) => {
+						showErrorPopup(msg);
+					});
+			}
+		});
+
+	}, 1000);  // 1 second
+}
+function stopPolling() {
+	clearInterval(intervalID);
+}
 
 const loadDashboard = () => {		//load dashboard
 	// hard reset channel list 
@@ -577,16 +614,26 @@ const loadDashboard = () => {		//load dashboard
 				const current_channel = document.createElement("button");
 				current_channel.setAttribute("id", "channel_" + channel.id);
 				current_channel.setAttribute("type", "button");
+				current_channel.setAttribute("data-channel-id", channel.id);
+				current_channel.style.color = "black";
 				current_channel.innerText = channel.name;
+
 				if (channel.private) {
 					if (channel.members.includes(globalUserId)) {
 						current_channel.setAttribute("class", "private-channel list-group-item list-group-item-action");
 						private_channel_list.appendChild(current_channel);
+						current_channel.setAttribute("data-if-in-channel", 1);
 					} 
 				}
 				else {
 					current_channel.setAttribute("class", "public-channel list-group-item list-group-item-action");
 					public_channel_list.appendChild(current_channel);
+					if (channel.members.includes(globalUserId)) {
+						current_channel.setAttribute("data-if-in-channel", 1);
+					}
+					else {
+						current_channel.setAttribute("data-if-in-channel", 0);
+					}
 					
 				}
 				current_channel.addEventListener('click', () => { //check if user is in the channel
@@ -594,7 +641,7 @@ const loadDashboard = () => {		//load dashboard
 					document.getElementById('btn-channel-info').style.display = 'block';
 					document.getElementById('btn-channel-info-invite').style.display = 'block';
 					document.getElementById('channel-title-bar-name').textContent = channel.name;
-
+					current_channel.style.color = "black";
 					current_channel_id = channel.id;
 					if (channel.members.includes(globalUserId)) {  // load messages if user is in the channel
 						document.getElementById('btn-channel-info-leave').style.display = 'block';
@@ -1225,6 +1272,8 @@ let globalUserEmail = null;
 let globalUserDescription = null;
 let globalUserAvatar = null;
 
+
+
 const showPage = (pageName) => {
 	for (const page of document.querySelectorAll('.page-block')) {
 		page.style.display = 'none';
@@ -1232,6 +1281,7 @@ const showPage = (pageName) => {
 	document.getElementById(`page-${pageName}`).style.display = 'block';
 	if (pageName === 'dashboard') {
 		loadDashboard();
+		startPolling();
 		apiCallGet2(`user/${globalUserId}`, {}, true)
 			.then(body => {
 				console.log(body);
@@ -1303,6 +1353,7 @@ document.getElementById('login-submit').addEventListener('click', (e) => { //log
 
 document.getElementById('logout').addEventListener('click', (e) => { //logout button
 	clearChildren(document.getElementById('channel-chatroom'));
+	stopPolling();
 	document.getElementById('channel-screen').style.display = 'none';
 	apiCallPost2('auth/logout', {}, true)
 		.then(() => {

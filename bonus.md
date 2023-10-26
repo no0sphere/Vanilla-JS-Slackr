@@ -1,1 +1,1 @@
-(optional) TODO!
+Add avatar in messages
