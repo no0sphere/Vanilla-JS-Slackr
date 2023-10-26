@@ -271,6 +271,7 @@ const loadMoreMessages = () => {
 				message_content_sender_avatar.setAttribute("class", "message-user-avatar");
 				message_content_sender_avatar.setAttribute("src", "./assets/default_avatar.jpg");
 				message_content_sender_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
+				message_content_sender_avatar.setAttribute("alt", "avatar");
 
 				if (short_memo_channel_members_avatar[message.sender]) {
 					message_content_sender_avatar.setAttribute("src", short_memo_channel_members_avatar[message.sender]);
@@ -290,6 +291,7 @@ const loadMoreMessages = () => {
 					current_message_content_image.setAttribute("class", "message-image");
 					current_message_content_image.setAttribute("src", message.image);
 					current_message_content_image.setAttribute("id", `image${message.id}`);
+					current_message_content_image.setAttribute("alt", `image${message.id}`);
 					current_channel_image_queue.push(`image${message.id}`);
 					const current_message_content_image_index = current_channel_image_queue.length - 1;
 					current_message_content_image.addEventListener('click', () => { //check image popup
@@ -517,6 +519,7 @@ const loadMessages = () => {
 				message_content_sender_avatar.setAttribute("class", "message-user-avatar");
 				message_content_sender_avatar.setAttribute("src", "./assets/default_avatar.jpg");
 				message_content_sender_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
+				message_content_sender_avatar.setAttribute("alt", "avatar");
 
 				if (short_memo_channel_members_avatar[message.sender]) {
 					message_content_sender_avatar.setAttribute("src", short_memo_channel_members_avatar[message.sender]);
@@ -536,7 +539,7 @@ const loadMessages = () => {
 					current_message_content_image.setAttribute("class", "message-image");
 					current_message_content_image.setAttribute("src", message.image);
 					current_message_content_image.setAttribute("id", `image${message.id}`);
-					current_message_content_image.setAttribute("id", `image${message.id}`);
+					current_message_content_image.setAttribute("alt", `image${message.id}`);
 					current_channel_image_queue.push(`image${message.id}`);
 					const current_message_content_image_index = current_channel_image_queue.length - 1;
 					current_message_content_image.addEventListener('click', () => { //check image popup
@@ -788,6 +791,7 @@ const pinned_messages_in_channel = (channel_id, loop_count, messages_index, pre_
 						message_content_sender_avatar.setAttribute("class", "message-user-avatar");
 						message_content_sender_avatar.setAttribute("src", "./assets/default_avatar.jpg");
 						message_content_sender_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
+						message_content_sender_avatar.setAttribute("alt", "avatar");
 
 						if (short_memo_channel_members_avatar[message.sender]) {
 							message_content_sender_avatar.setAttribute("src", short_memo_channel_members_avatar[message.sender]);
@@ -808,6 +812,7 @@ const pinned_messages_in_channel = (channel_id, loop_count, messages_index, pre_
 							current_message_content_image.setAttribute("class", "message-image");
 							current_message_content_image.setAttribute("src", message.image);
 							current_message_content_image.setAttribute("id", `image${message.id}`);
+							current_message_content_image.setAttribute("alt", `image${message.id}`);
 							current_channel_image_queue.push(`image${message.id}`);
 							const current_message_content_image_index = current_channel_image_queue.length - 1;
 							current_message_content_image.addEventListener('click', () => { //check image popup
@@ -1145,6 +1150,7 @@ document.getElementById('btn-channel-info-invite').addEventListener('click', () 
 									const current_user_avatar = document.createElement("img");
 									current_user_avatar.setAttribute("class", "message-user-avatar");
 									current_user_avatar.setAttribute("src", "./assets/default_avatar.jpg");
+									current_user_avatar.setAttribute("src", "avatar");
 									if (body3.image) {
 										current_user_avatar.setAttribute("src", body3.image);
 									}
