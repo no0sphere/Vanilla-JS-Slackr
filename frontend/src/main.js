@@ -367,7 +367,7 @@ const message_reaction = (message_id, message_reacts, reaction, emoji) => {
 	return message_react_container;
 }
 
-const message_pin = (message_id, pre_status, pin_btn) => {
+const message_pin = (message_id, pre_status, pin_btn) => { //pin message
 	let current_status = pre_status;
 	if (current_status === true) {
 		pin_btn.setAttribute("style", "background-color: blue;");
@@ -564,7 +564,7 @@ document.getElementById('close-sender-info-PopupBtn').addEventListener('click', 
 let channels_last_messaage_time_dict = {};
 let intervalID = null;	//store interval id
 
-const startPolling = () => {			//check if there is new message
+const startPolling = () => {			//check if there is new message, font color will change to red
 	intervalID = setInterval(() => {			// check every 1 second
 		const all_channel_list = document.getElementById('all-channels-list');
 		const channels = all_channel_list.querySelectorAll('[data-channel-id]');
