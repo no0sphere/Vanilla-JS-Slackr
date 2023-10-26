@@ -1238,7 +1238,7 @@ document.getElementById('btn-channel-info-leave').addEventListener('click', () =
 
 
 
-document.getElementById('btn-channel-info').addEventListener('click', () => {
+document.getElementById('btn-channel-info').addEventListener('click', () => {	//check channel info
 	apiCallGet2(`channel/${current_channel_id}`, {}, true)
 		.then(body => {
 			console.log(body);
