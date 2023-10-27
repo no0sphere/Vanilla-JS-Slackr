@@ -66,3 +66,20 @@ export const insertAsFirstChild = (parentElement, newChild) => {
     }
 }
 
+export const insertSortedById = (parentElement, newChild) => {
+    const children = Array.from(parentElement.children);
+    let isInserted = false;
+
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (child.id > newChild.id) {
+            parentElement.insertBefore(newChild, child);
+            isInserted = true;
+            break;
+        }
+    }
+
+    if (!isInserted) {
+        parentElement.appendChild(newChild);
+    }
+}

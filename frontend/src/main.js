@@ -5,6 +5,7 @@ import {
 	apiCallPost,
 	clearChildren,
 	insertAsFirstChild,
+	insertSortedById
 } from './helpers.js';
 
 let globalToken = null;
@@ -1150,17 +1151,19 @@ document.getElementById('btn-channel-info-invite').addEventListener('click', () 
 									const current_user_avatar = document.createElement("img");
 									current_user_avatar.setAttribute("class", "message-user-avatar");
 									current_user_avatar.setAttribute("src", "./assets/default_avatar.jpg");
-									current_user_avatar.setAttribute("src", "avatar");
+									current_user_avatar.setAttribute("alt", "avatar");
 									if (body3.image) {
 										current_user_avatar.setAttribute("src", body3.image);
 									}
 									current_user_avatar.setAttribute("style", "width: 30px; height: 30px; border-radius: 50%;");
 									const current_user_container = document.createElement("div");
 									current_user_container.setAttribute("style", "display: flex; flex-direction: row; align-items: center; margin-bottom: 10px;");
+									current_user_container.setAttribute("id", `${body3.name}_container`);
 									current_user_container.appendChild(current_user_checkbox);
 									current_user_container.appendChild(current_user_avatar);
 									current_user_container.appendChild(current_user_label);
-									document.getElementById('channel-inviting-users-list').appendChild(current_user_container);
+									const users_list = document.getElementById('channel-inviting-users-list')
+									insertSortedById(users_list, current_user_container);
 								})
 								.catch((msg) => {
 									showErrorPopup(msg);
