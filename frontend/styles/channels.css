@@ -193,3 +193,10 @@
     width: 100px;
     font-size:xx-large;
 }
+
+
+@media (max-width: 650px) {
+    p ,div ,button ,h3 {
+        font-size: 12px;
+    }
+}
